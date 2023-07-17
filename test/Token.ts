@@ -49,7 +49,22 @@ describe("Token contract", function () {
       await marketplace.connect(addr1).delistNft(0);
       expect(await hardhatToken.ownerOf(0)).to.equal(addr1.address);
     });
+    it("Should mintURI", async function () {
 
+      const { hardhatToken, marketplace, addr1 } = await loadFixture(deployTokenFixture);
+
+      await hardhatToken.mintURI(addr1.address, "https://famousfoxes.com/metadata/7779.json");
+      expect(await hardhatToken.balanceOf(addr1.address)).to.equal(1);
+
+      const listingPrice = await marketplace.listingPrice();
+
+      await hardhatToken.connect(addr1).approve(marketplace.address, 0);
+      await marketplace.connect(addr1).listNft(hardhatToken.address, 0, ethers.utils.parseEther("0.1"), { value: listingPrice });
+      expect(await hardhatToken.ownerOf(0)).to.equal(marketplace.address);
+
+      await marketplace.connect(addr1).delistNft(0);
+      expect(await hardhatToken.ownerOf(0)).to.equal(addr1.address);
+    });
     it("Should change price NFT", async function () {
       const { hardhatToken, marketplace, addr1 } = await loadFixture(deployTokenFixture);
       await hardhatToken.giveAway(addr1.address);

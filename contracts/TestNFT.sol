@@ -4,14 +4,11 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TestNFT is ERC721, Ownable {
+contract TestNFT is ERC721 {
     using Strings for uint256;
     mapping(uint256 => string) private _tokenURIs;
-
-    string private _baseURIextended;
-
+    address public owner;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     address nftMarketplaceAddress;
@@ -20,10 +17,6 @@ contract TestNFT is ERC721, Ownable {
         address _nftMarketplaceAddress
     ) public ERC721("TestNFT", "TEST") {
         nftMarketplaceAddress = _nftMarketplaceAddress;
-    }
-
-    function setBaseURI(string memory baseURI_) external onlyOwner {
-        _baseURIextended = baseURI_;
     }
 
     function _setTokenURI(
@@ -45,6 +38,20 @@ contract TestNFT is ERC721, Ownable {
         _setTokenURI(tokenId, mockTokenURI);
         setApprovalForAll(nftMarketplaceAddress, true);
         _tokenIds.increment();
+        owner = msg.sender;
+        return tokenId;
+    }
+
+    function mintURI(
+        address to,
+        string memory mockTokenURI
+    ) public returns (uint256) {
+        uint256 tokenId = _tokenIds.current();
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, mockTokenURI);
+        setApprovalForAll(nftMarketplaceAddress, true);
+        _tokenIds.increment();
+        owner = msg.sender;
         return tokenId;
     }
 }
