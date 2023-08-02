@@ -5,7 +5,6 @@ const { ethers } = require("hardhat");
 describe("Token contract", function () {
 
   async function deployTokenFixture() {
-
     const Token = await ethers.getContractFactory("TestNFT");
     const Marketplace = await ethers.getContractFactory("NFTMarketplace");
     const [owner, addr1, addr2, addr3] = await ethers.getSigners();

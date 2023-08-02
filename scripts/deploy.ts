@@ -1,19 +1,22 @@
 import { ethers } from "hardhat";
+const listingPriceInWei = ethers.utils.parseUnits("0.0001", "ether");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const [deployer] = await ethers.getSigners();
 
-  const lockedAmount = ethers.utils.parseEther("0.001");
+  console.log("Deploying contracts with the account:", deployer.address);
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  // Deploy NFTMarketplace contract
+  const NFTMarketplace = await ethers.getContractFactory("NFTMarketplace");
+  const nftMarketplace = await NFTMarketplace.deploy(listingPriceInWei); // Pass the listing price as an argument
+  await nftMarketplace.deployed();
+  console.log("NFTMarketplace deployed at address:", nftMarketplace.address);
 
-  await lock.deployed();
-
-  console.log(
-    `Lock with ${ethers.utils.formatEther(lockedAmount)}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+  // Deploy TestNFT contract and pass the NFTMarketplace address as an argument
+  const TestNFT = await ethers.getContractFactory("TestNFT");
+  const testNFT = await TestNFT.deploy(nftMarketplace.address);
+  await testNFT.deployed();
+  console.log("TestNFT deployed at address:", testNFT.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -22,3 +25,7 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+
+//NFT 0xAFbBd56B0afC9458FE9dec7ef7c48EF9703d0563
+//MARKET 0x1B3a597134e204b7beF0F5731bAA45FC724f5bB4

@@ -10,4 +10,11 @@ npx hardhat test
 REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.ts
+
+npx hardhat compile
+npx hardhat test
+
+npx hardhat run --network bsctest scripts/deploy.ts
+npx hardhat verify --network bsctest {address NFT} {address Marketplace}
+npx hardhat verify --network bsctest {address Marketplace} {listingPrice}
 ```

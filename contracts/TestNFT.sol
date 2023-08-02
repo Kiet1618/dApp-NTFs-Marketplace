@@ -13,9 +13,7 @@ contract TestNFT is ERC721 {
     Counters.Counter private _tokenIds;
     address nftMarketplaceAddress;
 
-    constructor(
-        address _nftMarketplaceAddress
-    ) public ERC721("TestNFT", "TEST") {
+    constructor(address _nftMarketplaceAddress) ERC721("TestNFT", "TEST") {
         nftMarketplaceAddress = _nftMarketplaceAddress;
     }
 
@@ -44,11 +42,11 @@ contract TestNFT is ERC721 {
 
     function mintURI(
         address to,
-        string memory mockTokenURI
+        string memory tokenURI
     ) public returns (uint256) {
         uint256 tokenId = _tokenIds.current();
         _safeMint(to, tokenId);
-        _setTokenURI(tokenId, mockTokenURI);
+        _setTokenURI(tokenId, tokenURI);
         setApprovalForAll(nftMarketplaceAddress, true);
         _tokenIds.increment();
         owner = msg.sender;
