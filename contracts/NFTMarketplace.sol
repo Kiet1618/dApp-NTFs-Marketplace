@@ -24,6 +24,7 @@ contract NFTMarketplace {
     Item[] public items;
 
     Counters.Counter private _itemIds;
+    mapping(address => uint256[]) private itemsBySeller;
 
     function listNft(
         address _nftAddress,
@@ -85,5 +86,22 @@ contract NFTMarketplace {
 
     function isSold(uint256 _itemId) public view returns (bool) {
         return items[_itemId].sold;
+    }
+
+    function getAllNfts() public view returns (Item[] memory) {
+        return items;
+    }
+
+    function getNftsByAddress(
+        address _seller
+    ) public view returns (Item[] memory) {
+        uint256[] memory itemIds = itemsBySeller[_seller];
+        Item[] memory result = new Item[](itemIds.length);
+
+        for (uint256 i = 0; i < itemIds.length; i++) {
+            uint256 itemId = itemIds[i];
+            result[i] = items[itemId];
+        }
+        return result;
     }
 }
