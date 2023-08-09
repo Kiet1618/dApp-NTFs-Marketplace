@@ -2,7 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -45,6 +46,7 @@ contract NFTMarketplace {
         items.push(
             Item(_nftAddress, _tokenId, _price, payable(msg.sender), false)
         );
+        itemsBySeller[msg.sender].push(itemId); // Add item to the seller's items
         return itemId;
     }
 
@@ -58,11 +60,19 @@ contract NFTMarketplace {
             item.tokenId
         );
         delete items[_itemId];
+        uint256[] storage sellerItems = itemsBySeller[msg.sender];
+        for (uint256 i = 0; i < sellerItems.length; i++) {
+            if (sellerItems[i] == _itemId) {
+                sellerItems[i] = sellerItems[sellerItems.length - 1];
+                sellerItems.pop();
+                break;
+            }
+        }
     }
 
     function changeNftPrice(uint256 _itemId, uint256 _price) public {
         Item storage item = items[_itemId];
-        require(item.seller == msg.sender, "Only seller can delist item");
+        require(item.seller == msg.sender, "Only seller can change item price");
         require(!item.sold, "Item is not sold");
         item.price = _price;
     }
@@ -82,6 +92,14 @@ contract NFTMarketplace {
         );
         item.seller.transfer(msg.value);
         item.sold = true;
+        uint256[] storage sellerItems = itemsBySeller[item.seller];
+        for (uint256 i = 0; i < sellerItems.length; i++) {
+            if (sellerItems[i] == _itemId) {
+                sellerItems[i] = sellerItems[sellerItems.length - 1];
+                sellerItems.pop();
+                break;
+            }
+        }
     }
 
     function isSold(uint256 _itemId) public view returns (bool) {

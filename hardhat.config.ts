@@ -7,7 +7,7 @@ const config: HardhatUserConfig = {
   solidity: "0.8.18",
   networks: {
     localhost: {
-      url: "http://localhost:8545", // Update the port if your local node is running on a different one
+      url: "http://localhost:8545",
       accounts: [process.env.PRIV_KEY_LOCAL || ""]
     },
     bsctest: {

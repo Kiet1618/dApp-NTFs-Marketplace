@@ -19,11 +19,8 @@ describe("Token contract", function () {
   }
 
   describe("Deployment", function () {
-
     it("Should set the right owner", async function () {
-
       const { hardhatToken, owner, addr1 } = await loadFixture(deployTokenFixture);
-
       await hardhatToken.giveAway(addr1.address);
 
       expect(await hardhatToken.owner()).to.equal(owner.address);
